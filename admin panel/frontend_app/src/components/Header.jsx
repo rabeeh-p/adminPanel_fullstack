@@ -51,7 +51,7 @@ const Header = () => {
         // Dispatch logout action to clear user data from Redux
         dispatch(logout());
         // Redirect to the login page
-        navigate("/login");
+        navigate("/");
     };
 
     return (

@@ -20,3 +20,14 @@ export const signupUser = async (userData) => {
     throw error.response.data;
   }
 };
+
+
+export const getUsers = async () => {
+  const token = localStorage.getItem("access_token");
+  const response = await axios.get("/api/admin/users/", {
+    headers: {
+      Authorization: `Bearer ${token}`,  // Sending token in Authorization header
+    },
+  });
+  return response;
+};

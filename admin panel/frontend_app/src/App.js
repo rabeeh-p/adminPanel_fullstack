@@ -6,6 +6,7 @@ import Signup from './components/Signup';
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import UserHomePage from './components/UserHome';
 import { useEffect, useState } from 'react';
+import AdminHome from './components/AdminHome';
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
       <Route path='/signup' element={<Signup/>} />
       <Route path='/' element={<Login/>} />
       <Route path='/userhome' element={<UserHomePage  />} />
+      <Route path='/admin' element={<AdminHome  />} />
 
 
       

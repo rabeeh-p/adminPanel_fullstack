@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
     const [formData, setFormData] = useState({
         username: "",
         email: "",
         password: "",
+        confirmPassword: "",  // Added confirmPassword
+        firstName: "",        // Added firstName
+        lastName: "",         // Added lastName
         phone_number: "",
         image: null,
     });
     const [message, setMessage] = useState("");
+
+    const navigate = useNavigate()
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
@@ -29,10 +35,18 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (formData.password !== formData.confirmPassword) {
+            setMessage("Passwords do not match.");
+            return;
+        }
+
         const form = new FormData();
         form.append("username", formData.username);
         form.append("email", formData.email);
         form.append("password", formData.password);
+        // form.append("confirmPassword", formData.confirmPassword);
+        form.append("first_name", formData.firstName);
+        form.append("last_name", formData.lastName);
         form.append("phone_number", formData.phone_number);
         if (formData.image) form.append("image", formData.image);
 
@@ -42,7 +56,9 @@ const Signup = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            setMessage(response.data.message);
+            // setMessage(response.data.message);
+            alert(response.data.message)
+            navigate('/')
         } catch (error) {
             setMessage("Signup failed. Please try again.");
         }
@@ -89,7 +105,7 @@ const Signup = () => {
     };
 
     return (
-        <div style={{ textAlign: "center" ,marginTop:'90px' }}>
+        <div style={{ textAlign: "center", marginTop: '90px' }}>
             <h2>Signup</h2>
             <form onSubmit={handleSubmit} style={formStyles}>
                 <div>
@@ -98,6 +114,28 @@ const Signup = () => {
                         type="text"
                         name="username"
                         value={formData.username}
+                        onChange={handleChange}
+                        required
+                        style={inputStyles}
+                    />
+                </div>
+                <div>
+                    <label style={labelStyles}>First Name:</label>
+                    <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        required
+                        style={inputStyles}
+                    />
+                </div>
+                <div>
+                    <label style={labelStyles}>Last Name:</label>
+                    <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
                         onChange={handleChange}
                         required
                         style={inputStyles}
@@ -120,6 +158,17 @@ const Signup = () => {
                         type="password"
                         name="password"
                         value={formData.password}
+                        onChange={handleChange}
+                        required
+                        style={inputStyles}
+                    />
+                </div>
+                <div>
+                    <label style={labelStyles}>Confirm Password:</label>
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
                         onChange={handleChange}
                         required
                         style={inputStyles}
