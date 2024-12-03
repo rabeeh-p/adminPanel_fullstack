@@ -1,66 +1,174 @@
 import React, { useState, useEffect } from "react";
-import { getUsers } from "../api/auth"; // Assume you have an API function to get users
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
+import axios from "axios";
+import { blockUser, unblockUser } from "../redux/userSlice"; // Import actions
 
 const AdminUserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const blockedUsers = useSelector((state) => state.user.blockedUsers);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await getUsers(); // This fetches all users
-        setUsers(response.data);
+        const token = localStorage.getItem("access_token");
+        const response = await axios.get("http://127.0.0.1:8000/users-list/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (Array.isArray(response.data)) {
+          setUsers(response.data);
+          console.log(response.data, "data");
+        } else {
+          setError("Unexpected response format.");
+        }
+
         setLoading(false);
       } catch (error) {
         setError("Failed to load users.");
         setLoading(false);
       }
     };
-    fetchUsers();
-  }, []);
 
-  // Function to handle viewing a user's details
+    fetchUsers();
+  }, []); 
+
   const handleViewUser = (userId) => {
     navigate(`/admin/user/${userId}`);
   };
 
-  // If loading, show a loading message
+  const handleBlockUser = async (userId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const userIndex = users.findIndex((user) => user.id === userId);
+      if (userIndex === -1) {
+        alert("User not found.");
+        return;
+      }
+
+      const user = users[userIndex];
+
+      const response = await axios.put(
+        `http://127.0.0.1:8000/block-unblock-user/${userId}/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updatedUsers = [...users];
+      updatedUsers[userIndex].profile.blocked = !updatedUsers[userIndex].profile.blocked;
+
+      setUsers(updatedUsers);
+
+      if (updatedUsers[userIndex].profile.blocked) {
+        dispatch(blockUser(userId));
+        alert("User blocked successfully.");
+      } else {
+        dispatch(unblockUser(userId));
+        alert("User unblocked successfully.");
+      }
+    } catch (error) {
+      alert("Failed to change user status.");
+    }
+  };
+
   if (loading) {
-    return <div>Loading users...</div>;
+    return <div>Loading users...!</div>;
   }
 
-  // If there's an error, show the error message
   if (error) {
     return <div>{error}</div>;
   }
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Admin User List</h2>
-      <table style={styles.table}>
+    <div style={{ padding: "20px", backgroundColor: "#f4f7fc" }}>
+      <h2
+        style={{
+          fontSize: "26px",
+          fontWeight: "600",
+          textAlign: "center",
+          marginBottom: "30px",
+          color: "#2c3e50",
+        }}
+      >
+        Admin User List
+      </h2>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          backgroundColor: "white",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        }}
+      >
         <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Actions</th>
+          <tr
+            style={{
+              backgroundColor: "#3498db",
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            <th style={{ padding: "12px 15px" }}>First Name</th>
+            <th style={{ padding: "12px 15px" }}>Last Name</th>
+            <th style={{ padding: "12px 15px" }}>Email</th>
+            <th style={{ padding: "12px 15px" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{user.phone || "Not available"}</td>
-              <td>
+            <tr
+              key={user.id}
+              style={{
+                borderBottom: "1px solid #e0e0e0",
+                backgroundColor: "#fafafa",
+              }}
+            >
+              <td style={{ padding: "12px 15px" }}>{user.first_name}</td>
+              <td style={{ padding: "12px 15px" }}>{user.last_name}</td>
+              <td style={{ padding: "12px 15px" }}>{user.email}</td>
+              <td style={{ padding: "12px 15px", textAlign: "center" }}>
                 <button
                   onClick={() => handleViewUser(user.id)}
-                  style={styles.viewButton}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#3498db",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                    marginRight: "10px",
+                  }}
                 >
                   View Details
+                </button>
+                <button
+                  onClick={() => handleBlockUser(user.id)}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: user.profile.blocked
+                      ? "#e74c3c"
+                      : "#2ecc71", 
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                >
+                  {user.profile.blocked ? "Unblock" : "Block"}{" "}
                 </button>
               </td>
             </tr>
@@ -69,42 +177,6 @@ const AdminUserList = () => {
       </table>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    padding: "20px",
-    backgroundColor: "#f9f9f9",
-  },
-  heading: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginBottom: "20px",
-  },
-  tableHeader: {
-    backgroundColor: "#3498db",
-    color: "white",
-    padding: "12px",
-  },
-  tableRow: {
-    borderBottom: "1px solid #ccc",
-    padding: "10px",
-  },
-  viewButton: {
-    padding: "6px 12px",
-    backgroundColor: "#3498db",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
 };
 
 export default AdminUserList;

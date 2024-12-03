@@ -16,6 +16,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.exceptions import NotFound
+from django.shortcuts import get_object_or_404
+from .models import UserProfile
 # Create your views here.
 
 
@@ -47,52 +51,53 @@ def user_signup(request):
 
 
 
-class UserLoginView(APIView):
-    permission_classes = [AllowAny] 
-    def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-
-        user = authenticate(username=username, password=password)
-        if user:
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            })
-        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-
 # class UserLoginView(APIView):
-#     permission_classes = [AllowAny]
-
+#     permission_classes = [AllowAny] 
 #     def post(self, request):
-#         # Get username and password from the request
 #         username = request.data.get('username')
 #         password = request.data.get('password')
 
-#         # Authenticate user
 #         user = authenticate(username=username, password=password)
 #         if user:
-#             # Generate JWT tokens for the user
 #             refresh = RefreshToken.for_user(user)
-            
-#             # Prepare the response data
-#             response_data = {
+#             return Response({
 #                 'refresh': str(refresh),
 #                 'access': str(refresh.access_token),
-#                 'user': {
-#                     'username': user.username,
-#                     'email': user.email,
-#                     'is_admin': user.is_admin,  # Include the user's role (admin or not)
-#                 }
-#             }
-            
-#             # Return the response with the tokens and user data
-#             return Response(response_data)
-
-#         # If authentication fails, return an error message
+#             })
 #         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        # Get username and password from the request
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        # Authenticate user
+        user = authenticate(username=username, password=password)
+        if user:
+            # Generate JWT tokens for the user
+            refresh = RefreshToken.for_user(user)
+            
+            # Prepare the response data
+            print(user.is_superuser,'admin')
+            response_data = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': {
+                    'username': user.username,
+                    'email': user.email,
+                    'is_superuser': user.is_superuser,  # Include the user's role (admin or not)
+                }
+            }
+            
+            # Return the response with the tokens and user data
+            return Response(response_data)
+
+        # If authentication fails, return an error message
+        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -117,25 +122,60 @@ class LogoutView(APIView):
 
     def post(self, request):
         try:
-            # Invalidate the refresh token if you are using a refresh mechanism
-            # For JWT, typically no server-side action is needed
+           
             return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"detail": "Failed to log out."}, status=status.HTTP_400_BAD_REQUEST)
         
 
 
-
-
 class UserListView(APIView):
-    permission_classes = [IsAdminUser]  # Ensure only admins can access this view
+    permission_classes = [IsAdminUser]
+    print('Admin side is working')
 
     def get(self, request):
-        # Fetch all users from the User model
-        users = User.objects.all()
+        print('Admin side is working')
         
-        # Serialize the users and their profiles data
+        # Fetch all users
+        users = User.objects.filter(is_superuser=False) 
+        
+        # Serialize users
         serializer = UserSerializer(users, many=True)
         
-        # Return the serialized data as a response
         return Response(serializer.data)
+    
+
+
+class UserDetailView(RetrieveAPIView):
+    permission_classes = [IsAdminUser]  # Only allow admin users to access this view
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        # Get the user by userId from the URL
+        user_id = self.kwargs['userId']
+        print(user_id,'id')
+        try:
+            user = User.objects.get(id=user_id)
+            return user
+        except User.DoesNotExist:
+            raise NotFound(detail="User not found.", code=404)
+        
+
+class BlockUnblockUserView(APIView):
+    permission_classes = [IsAuthenticated]  # Make sure only authenticated users can access this endpoint
+
+    def put(self, request, user_id):
+        print('is wokring put')
+        user_profile = get_object_or_404(UserProfile, user__id=user_id)  # Get the user profile by user_id
+
+        # Toggle the blocked status
+        user_profile.blocked = not user_profile.blocked
+        user_profile.save()  # Save the new status
+
+        action = "blocked" if user_profile.blocked else "unblocked"  # Determine the action (block or unblock)
+
+        return Response(
+            {"message": f"User has been {action} successfully."},
+            status=status.HTTP_200_OK
+        )

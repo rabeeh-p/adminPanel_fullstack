@@ -7,7 +7,9 @@ urlpatterns = [
     path('login/', views.UserLoginView.as_view(), name='user_login'),
     path('user-home/', views.get_user_details, name='user-home'),
     path('api/logout/', views.LogoutView.as_view(), name='logout'),
-    path('admin/users/', views.UserListView.as_view(), name='user-list'),
+    path('users-list/', views.UserListView.as_view(), name='user-list'),
+    path('users/<int:userId>/', views.UserDetailView.as_view(), name='user-detail'),
+    path('block-unblock-user/<int:user_id>/', views.BlockUnblockUserView.as_view(), name='block-unblock-user'),
     
 ]
 

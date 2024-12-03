@@ -7,9 +7,9 @@ const Signup = () => {
         username: "",
         email: "",
         password: "",
-        confirmPassword: "",  // Added confirmPassword
-        firstName: "",        // Added firstName
-        lastName: "",         // Added lastName
+        confirmPassword: "",  
+        firstName: "",        
+        lastName: "",         
         phone_number: "",
         image: null,
     });
@@ -22,13 +22,14 @@ const Signup = () => {
         if (type === "file") {
             setFormData({
                 ...formData,
-                [name]: files[0], // store the file
+                [name]: files[0], 
             });
         } else {
             setFormData({
                 ...formData,
                 [name]: value,
             });
+            
         }
     };
 
@@ -44,7 +45,6 @@ const Signup = () => {
         form.append("username", formData.username);
         form.append("email", formData.email);
         form.append("password", formData.password);
-        // form.append("confirmPassword", formData.confirmPassword);
         form.append("first_name", formData.firstName);
         form.append("last_name", formData.lastName);
         form.append("phone_number", formData.phone_number);
@@ -56,7 +56,6 @@ const Signup = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            // setMessage(response.data.message);
             alert(response.data.message)
             navigate('/')
         } catch (error) {

@@ -73,18 +73,26 @@ class UserSignupSerializer(serializers.ModelSerializer):
     
 
 
-
-
-# Serializer to include additional profile fields
+# Serializer for UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'image']
+        fields = ['phone_number', 'image','blocked']
 
-# Serializer to include User and UserProfile data
+# Serializer for User
 class UserSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer()  # Nested serializer for user profile
+    profile = serializers.SerializerMethodField()  # Use a method to include profile data safely
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'is_staff', 'is_active', 'profile']
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'date_joined', 'is_staff', 'is_active', 'profile'
+        ]
+
+    def get_profile(self, obj):
+        try:
+            profile = obj.profile  # Access related profile
+            return UserProfileSerializer(profile).data
+        except UserProfile.DoesNotExist:
+            return None  # Return None if no profile exists

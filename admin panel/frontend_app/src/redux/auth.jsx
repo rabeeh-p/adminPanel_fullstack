@@ -1,9 +1,8 @@
-// src/redux/auth.js (Redux Slice)
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   accessToken: localStorage.getItem("access_token") || null,
-  user: null, // Store user data (e.g., username)
+  user: null, 
 };
 
 const authSlice = createSlice({

@@ -1,14 +1,12 @@
-// src/redux/userSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios"; // Import axios for making API requests
+import axios from "axios";
 
-// Helper function to safely parse JSON
 const safeParse = (value) => {
   try {
     return value ? JSON.parse(value) : null;
   } catch (error) {
     console.error("Failed to parse JSON:", error);
-    return null; // Return null as a fallback
+    return null;
   }
 };
 
@@ -17,6 +15,7 @@ export const userSlice = createSlice({
   initialState: {
     accessToken: localStorage.getItem("access_token") || null,
     user: safeParse(localStorage.getItem("user")),
+    blockedUsers: [], 
   },
   reducers: {
     setUser: (state, action) => {
@@ -24,18 +23,32 @@ export const userSlice = createSlice({
       state.user = action.payload.user;
       localStorage.setItem("access_token", action.payload.accessToken);
       localStorage.setItem("user", JSON.stringify(action.payload.user));
+
+      const fetchBlockedUsers = async () => {
+        try {
+          const response = await axios.get("http://127.0.0.1:8000/blocked-users/", {
+            headers: {
+              Authorization: `Bearer ${action.payload.accessToken}`,
+            },
+          });
+          const blockedUsers = response.data;
+          state.blockedUsers = blockedUsers; 
+        } catch (error) {
+          console.error("Error fetching blocked users:", error);
+        }
+      };
+
+      fetchBlockedUsers(); 
     },
     logout: (state) => {
       const logoutRequest = async () => {
         try {
-          // Make a request to the backend to log the user out
           await axios.post("http://127.0.0.1:8000/api/logout/", null, {
             headers: {
               Authorization: `Bearer ${state.accessToken}`,
             },
           });
 
-          // After logging out, clear localStorage and Redux state
           localStorage.removeItem("access_token");
           localStorage.removeItem("user");
         } catch (error) {
@@ -43,15 +56,23 @@ export const userSlice = createSlice({
         }
       };
 
-      logoutRequest(); // Call the logout request
+      logoutRequest();
 
-      // Clear Redux state
       state.accessToken = null;
       state.user = null;
+      state.blockedUsers = []; 
+    },
+    blockUser: (state, action) => {
+      if (!state.blockedUsers.includes(action.payload)) {
+        state.blockedUsers.push(action.payload); 
+      }
+    },
+    unblockUser: (state, action) => {
+      state.blockedUsers = state.blockedUsers.filter((userId) => userId !== action.payload); 
     },
   },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, logout, blockUser, unblockUser } = userSlice.actions;
 
 export default userSlice.reducer;

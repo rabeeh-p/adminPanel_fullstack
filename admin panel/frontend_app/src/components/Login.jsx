@@ -20,6 +20,9 @@ const Login = () => {
     });
   };
 
+  
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -28,11 +31,20 @@ const Login = () => {
       localStorage.setItem("refresh_token", response.refresh);
       dispatch(setUser({ accessToken: response.access, user: response.user }));
       setMessage("Login successful!");
-      navigate("/userhome");
+      console.log(response.user.is_superuser,'supser user');
+      console.log(response,'response');
+      
+  
+      if (response.user.is_superuser) {
+        navigate("/adminhome");
+      } else {
+        navigate("/userhome");
+      }
     } catch (error) {
       setMessage("Invalid credentials. Please try again.");
     }
   };
+  
 
   return (
     <div style={styles.container}>

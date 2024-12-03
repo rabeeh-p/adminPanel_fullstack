@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../redux/userSlice"; // Import your logout action
+import { logout } from "../redux/userSlice"; 
 
 const Header = () => {
     const navigate = useNavigate();
@@ -9,7 +9,6 @@ const Header = () => {
 
     const accessToken = useSelector((state) => state.user.accessToken);
 
-    // Header Styles
     const headerStyles = {
         display: "flex",
         justifyContent: "space-between",
@@ -48,9 +47,7 @@ const Header = () => {
     };
 
     const handleLogout = () => {
-        // Dispatch logout action to clear user data from Redux
         dispatch(logout());
-        // Redirect to the login page
         navigate("/");
     };
 
@@ -60,7 +57,6 @@ const Header = () => {
                 <img src="logo.png" alt="Logo" style={{ width: "40px", height: "40px" }} />
                 <span style={logoTextStyles}>MyApp</span>
             </div>
-            {/* Display the logout button only if the user is logged in */}
             {accessToken ? (
                 <button
                     onClick={handleLogout}

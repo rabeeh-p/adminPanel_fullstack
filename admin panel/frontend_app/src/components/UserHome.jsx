@@ -11,7 +11,6 @@ const UserHomePage = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState("");
 
-  // Fetch user details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -31,12 +30,10 @@ const UserHomePage = () => {
     }
   }, [accessToken]);
 
-  // Redirect if user is not logged in
   if (!accessToken) {
     return <Navigate to="/" />;
   }
 
-  // Handle logout
   const handleLogout = () => {
     dispatch(logout());
   };
