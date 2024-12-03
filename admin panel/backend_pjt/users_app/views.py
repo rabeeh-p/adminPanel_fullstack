@@ -34,54 +34,31 @@ def hello_world(request):
 def user_signup(request):
     print('is working signup')
 
-    # Initialize the serializer with the form data from request.data
     serializer = UserSignupSerializer(data=request.data)
 
-    # Check if the serializer is valid
     if serializer.is_valid():
-        # Save the user and profile data
         serializer.save()
         return JsonResponse({"message": "User created successfully!"}, status=201)
     else:
-        # Print the errors to the console for debugging
         print("Validation errors:", serializer.errors)
 
-        # Return errors in the serializer validation
         return JsonResponse({"error": serializer.errors}, status=400)
 
 
 
-# class UserLoginView(APIView):
-#     permission_classes = [AllowAny] 
-#     def post(self, request):
-#         username = request.data.get('username')
-#         password = request.data.get('password')
-
-#         user = authenticate(username=username, password=password)
-#         if user:
-#             refresh = RefreshToken.for_user(user)
-#             return Response({
-#                 'refresh': str(refresh),
-#                 'access': str(refresh.access_token),
-#             })
-#         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+  
 
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # Get username and password from the request
         username = request.data.get('username')
         password = request.data.get('password')
 
-        # Authenticate user
         user = authenticate(username=username, password=password)
         if user:
-            # Generate JWT tokens for the user
             refresh = RefreshToken.for_user(user)
             
-            # Prepare the response data
             print(user.is_superuser,'admin')
             response_data = {
                 'refresh': str(refresh),
@@ -89,23 +66,20 @@ class UserLoginView(APIView):
                 'user': {
                     'username': user.username,
                     'email': user.email,
-                    'is_superuser': user.is_superuser,  # Include the user's role (admin or not)
+                    'is_superuser': user.is_superuser,  
                 }
             }
             
-            # Return the response with the tokens and user data
             return Response(response_data)
 
-        # If authentication fails, return an error message
         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_details(request):
     print('working')
-    user = request.user  # Get the currently logged-in user
+    user = request.user  
     
-    # Construct the user details response
     user_details = {
         "username": user.username,
         "email": user.email,
@@ -118,11 +92,9 @@ def get_user_details(request):
 
 
 class LogoutView(APIView):
-    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            # request.user.auth_token.delete()
            
             return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -137,10 +109,8 @@ class UserListView(APIView):
     def get(self, request):
         print('Admin side is working')
         
-        # Fetch all users
         users = User.objects.filter(is_superuser=False) 
         
-        # Serialize users
         serializer = UserSerializer(users, many=True)
         
         return Response(serializer.data)
@@ -148,12 +118,11 @@ class UserListView(APIView):
 
 
 class UserDetailView(RetrieveAPIView):
-    permission_classes = [IsAdminUser]  # Only allow admin users to access this view
+    permission_classes = [IsAdminUser]  
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get_object(self):
-        # Get the user by userId from the URL
         user_id = self.kwargs['userId']
         print(user_id,'id')
         try:
@@ -164,17 +133,15 @@ class UserDetailView(RetrieveAPIView):
         
 
 class BlockUnblockUserView(APIView):
-    permission_classes = [IsAuthenticated]  # Make sure only authenticated users can access this endpoint
+    permission_classes = [IsAuthenticated]  
 
     def put(self, request, user_id):
         print('is wokring put')
-        user_profile = get_object_or_404(UserProfile, user__id=user_id)  # Get the user profile by user_id
-
-        # Toggle the blocked status
+        user_profile = get_object_or_404(UserProfile, user__id=user_id)  
         user_profile.blocked = not user_profile.blocked
-        user_profile.save()  # Save the new status
+        user_profile.save()  
 
-        action = "blocked" if user_profile.blocked else "unblocked"  # Determine the action (block or unblock)
+        action = "blocked" if user_profile.blocked else "unblocked" 
 
         return Response(
             {"message": f"User has been {action} successfully."},
@@ -190,7 +157,6 @@ def edit_user(request):
     user = request.user
     data = request.data
 
-    # Updating User fields
     try:
         user.username = data.get("username", user.username)
         user.email = data.get("email", user.email)
@@ -198,17 +164,14 @@ def edit_user(request):
         user.last_name = data.get("last_name", user.last_name)
         user.save()
 
-        # Updating Profile fields if they exist
         profile = UserProfile.objects.get(user=user)
         profile.phone_number = data.get("phone_number", profile.phone_number)
 
-        # Handle image upload
         if 'image' in request.FILES:
             profile.image = request.FILES['image']
 
         profile.save()
 
-        # Serialize updated user data
         user_serializer = UserSerializer(user)
         profile_serializer = UserProfileSerializer(profile)
 
