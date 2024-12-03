@@ -7,6 +7,7 @@ import UserHomePage from './components/UserHome';
 import { useEffect, useState } from 'react';
 import AdminHome from './components/AdminHome';
 import UserDetails from './components/UserDetails';
+import EditProfilePage from './components/EditUser';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
       <Route path='/userhome' element={<UserHomePage  />} />
       <Route path='/adminhome' element={<AdminHome  />} />
       <Route path="/admin/user/:userId" element={<UserDetails />} />
+      <Route path="/edit-page" element={<EditProfilePage />} />
 
 
       

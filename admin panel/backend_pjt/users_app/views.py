@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import MessageSerializer, UserSignupSerializer,UserSerializer
+from .serializers import MessageSerializer, UserSignupSerializer,UserSerializer,UserProfileSerializer
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse
@@ -179,3 +179,49 @@ class BlockUnblockUserView(APIView):
             {"message": f"User has been {action} successfully."},
             status=status.HTTP_200_OK
         )
+    
+
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_user(request):
+    user = request.user
+    data = request.data
+
+    # Updating User fields
+    try:
+        user.username = data.get("username", user.username)
+        user.email = data.get("email", user.email)
+        user.first_name = data.get("first_name", user.first_name)
+        user.last_name = data.get("last_name", user.last_name)
+        user.save()
+
+        # Updating Profile fields if they exist
+        profile = UserProfile.objects.get(user=user)
+        profile.phone_number = data.get("phone_number", profile.phone_number)
+
+        # Handle image upload
+        if 'image' in request.FILES:
+            profile.image = request.FILES['image']
+
+        profile.save()
+
+        # Serialize updated user data
+        user_serializer = UserSerializer(user)
+        profile_serializer = UserProfileSerializer(profile)
+
+        return Response(
+            {
+                "user": user_serializer.data,
+                "profile": profile_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        return Response(
+            {"error": "Failed to update user details", "details": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    

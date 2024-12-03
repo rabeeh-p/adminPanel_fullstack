@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { logout } from "../redux/userSlice";
 
 const UserHomePage = () => {
   const accessToken = useSelector((state) => state.user.accessToken);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
+
 
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState("");
@@ -37,6 +39,11 @@ const UserHomePage = () => {
   const handleLogout = () => {
     dispatch(logout());
   };
+  const handleEdit = () => {
+    // Navigate to the edit page or show an edit form
+    console.log("Edit button clicked");
+    navigate('/edit-page')
+  };
 
   return (
     <div style={styles.container}>
@@ -65,7 +72,16 @@ const UserHomePage = () => {
               <p style={styles.detailsText}><strong>Ph number:</strong> {userDetails.phone_number}</p>
             </div>
             
-            <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
+            {/* <button onClick={handleLogout} style={styles.logoutButton}>Logout</button> */}
+
+            <div style={styles.buttonContainer}>
+              <button onClick={handleEdit} style={styles.logoutButton}>
+                Edit
+              </button>
+              <button onClick={handleLogout} style={styles.logoutButton}>
+                Logout
+              </button>
+            </div>
           </div>
         ) : (
           <p style={styles.loadingText}>Loading user details...</p>
@@ -143,6 +159,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "16px",
     transition: "background-color 0.3s",
+    marginLeft:'10px'
   },
   logoutButtonHover: {
     backgroundColor: "#2980b9",
