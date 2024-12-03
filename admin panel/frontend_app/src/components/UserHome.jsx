@@ -12,7 +12,17 @@ const UserHomePage = () => {
 
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState("");
-
+  // const userRole = useSelector((state) => state.user.userRole);
+  // console.log(userRole,'rolee');
+  const userRole= localStorage.getItem('userRole') 
+  console.log(userRole,'userhoem roleee');
+  
+  
+  // if (userRole === "superuser") {
+  //   return <Navigate to="/adminhome" />
+  // }
+  
+  
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -26,6 +36,7 @@ const UserHomePage = () => {
         setError("Failed to fetch user details. Please try again.");
       }
     };
+   
 
     if (accessToken) {
       fetchUserDetails();
@@ -35,6 +46,9 @@ const UserHomePage = () => {
   if (!accessToken) {
     return <Navigate to="/" />;
   }
+ 
+  
+  
 
   const handleLogout = () => {
     dispatch(logout());

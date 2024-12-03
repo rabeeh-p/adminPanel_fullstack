@@ -12,6 +12,12 @@ const AdminUserList = () => {
   const dispatch = useDispatch();
 
   const blockedUsers = useSelector((state) => state.user.blockedUsers);
+  const userRole = useSelector((state) => state.user.role);
+
+  console.log(userRole,'rolee');
+  const sample= localStorage.getItem('userRole') 
+  console.log(sample,'samplee');
+  
 
   useEffect(() => {
     const fetchUsers = async () => {

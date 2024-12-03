@@ -8,6 +8,8 @@ const Header = () => {
     const dispatch = useDispatch();
 
     const accessToken = useSelector((state) => state.user.accessToken);
+    console.log(accessToken,'header');
+    
 
     const headerStyles = {
         display: "flex",
@@ -48,13 +50,15 @@ const Header = () => {
 
     const handleLogout = () => {
         dispatch(logout());
+        console.log('is worked');
+        
         navigate("/");
     };
 
     return (
         <header style={headerStyles}>
             <div style={logoStyles}>
-                <img src="logo.png" alt="Logo" style={{ width: "40px", height: "40px" }} />
+                {/* <img src="logo.png" alt="Logo" style={{ width: "40px", height: "40px" }} /> */}
                 <span style={logoTextStyles}>MyApp</span>
             </div>
             {accessToken ? (

@@ -118,10 +118,11 @@ def get_user_details(request):
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
+            # request.user.auth_token.delete()
            
             return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         except Exception as e:
