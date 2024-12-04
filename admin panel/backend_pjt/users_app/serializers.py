@@ -9,45 +9,19 @@ class MessageSerializer(serializers.Serializer):
 
 
 
-# class UserSignupSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True, min_length=8)
-#     phone_number = serializers.CharField(required=False, allow_blank=True, max_length=15)
-#     image = serializers.ImageField(required=False)
-
-#     class Meta:
-#         model = User
-#         fields = ['username', 'email', 'password', 'phone_number', 'image']
-
-#     def create(self, validated_data):
-#         # Extract user data and create the user
-#         user_data = {key: validated_data[key] for key in ['username', 'email', 'password']}
-#         user = User.objects.create_user(**user_data)
-
-#         # Extract profile data and create a UserProfile
-#         phone_number = validated_data.get('phone_number', '')
-#         image = validated_data.get('image', None)
-#         profile_data = {
-#             'user': user,
-#             'phone_number': phone_number,
-#             'image': image
-#         }
-#         UserProfile.objects.create(**profile_data)
-
-#         return user
 
 class UserSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     phone_number = serializers.CharField(required=False, allow_blank=True, max_length=15)
     image = serializers.ImageField(required=False)
-    first_name = serializers.CharField(required=True, max_length=30)  # First Name
-    last_name = serializers.CharField(required=True, max_length=30)   # Last Name
+    first_name = serializers.CharField(required=True, max_length=30)  
+    last_name = serializers.CharField(required=True, max_length=30)   
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name', 'phone_number', 'image']
 
     def create(self, validated_data):
-        # Extract user data, including first_name and last_name
         user_data = {
             'username': validated_data['username'],
             'email': validated_data['email'],
@@ -56,10 +30,8 @@ class UserSignupSerializer(serializers.ModelSerializer):
             'last_name': validated_data['last_name'],
         }
         
-        # Create the user with the data
         user = User.objects.create_user(**user_data)
 
-        # Extract profile data (phone number and image) and create a UserProfile
         phone_number = validated_data.get('phone_number', '')
         image = validated_data.get('image', None)
         profile_data = {
@@ -73,15 +45,13 @@ class UserSignupSerializer(serializers.ModelSerializer):
     
 
 
-# Serializer for UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['phone_number', 'image','blocked']
 
-# Serializer for User
 class UserSerializer(serializers.ModelSerializer):
-    profile = serializers.SerializerMethodField()  # Use a method to include profile data safely
+    profile = serializers.SerializerMethodField()  
 
     class Meta:
         model = User
@@ -92,10 +62,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_profile(self, obj):
         try:
-            profile = obj.profile  # Access related profile
+            profile = obj.profile  
             return UserProfileSerializer(profile).data
         except UserProfile.DoesNotExist:
-            return None  # Return None if no profile exists
+            return None   
         
     
 
@@ -121,20 +91,16 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = ['email', 'first_name', 'last_name', 'is_active', 'profile']
 
     def update(self, instance, validated_data):
-        # Separate profile data
         profile_data = validated_data.pop('profile', None)
 
-        # Update the User fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
-        # If profile data is present, update the profile
         if profile_data:
             profile_instance = instance.profile
             for attr, value in profile_data.items():
                 setattr(profile_instance, attr, value)
             profile_instance.save()
 
-        # Save the updated User instance
         instance.save()
         return instance

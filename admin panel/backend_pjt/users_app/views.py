@@ -155,21 +155,18 @@ class EditUserDetails(APIView):
     permission_classes = [IsAdminUser]
 
     def put(self, request, user_id):
-        """Handle PUT request to edit user details."""
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the admin is trying to edit a superuser (prevent superuser editing)
         if user.is_superuser:
             return Response({"detail": "Cannot edit superuser details."}, status=status.HTTP_403_FORBIDDEN)
 
-        # Use the new serializer for user updates
         serializer = UserUpdateSerializer(user, data=request.data)
 
         if serializer.is_valid():
-            serializer.save()  # Save the updated user details
+            serializer.save()   
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -228,7 +225,7 @@ def add_user(request):
 
         UserProfile.objects.create(
             user=user,
-            blocked=False  # Default blocked value
+            blocked=False   
         )
         return Response({"message": "User created successfully"}, status=HTTP_201_CREATED)
     except Exception as e:
