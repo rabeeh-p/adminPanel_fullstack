@@ -98,15 +98,7 @@ def get_user_details(request):
     return Response(user_details)
 
 
-class LogoutView(APIView):
 
-    def post(self, request):
-        try:
-           
-            return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"detail": "Failed to log out."}, status=status.HTTP_400_BAD_REQUEST)
-        
 
 
 class UserListView(APIView):
