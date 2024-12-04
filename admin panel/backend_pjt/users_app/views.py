@@ -20,6 +20,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from .models import UserProfile
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 # Create your views here.
 
 
@@ -189,3 +190,25 @@ def edit_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
     
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_user(request):
+    data = request.data
+    try:
+        user = User.objects.create_user(
+            username=data["email"],
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            email=data["email"],
+            password=data["password"]
+        )
+        user.save()
+
+        UserProfile.objects.create(
+            user=user,
+            blocked=False  # Default blocked value
+        )
+        return Response({"message": "User created successfully"}, status=HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)

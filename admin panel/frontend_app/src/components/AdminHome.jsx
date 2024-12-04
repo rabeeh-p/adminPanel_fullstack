@@ -110,6 +110,20 @@ const AdminUserList = () => {
       >
         Admin User List
       </h2>
+      <button
+        onClick={() => navigate("/admin-add-user")}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#3498db",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginBottom: "20px",
+        }}
+      >
+        Add User
+      </button>
       <table
         style={{
           width: "100%",
@@ -186,3 +200,5 @@ const AdminUserList = () => {
 };
 
 export default AdminUserList;
+
+

@@ -10,6 +10,7 @@ import UserDetails from './components/UserDetails';
 import EditProfilePage from './components/EditUser';
 import ProtectedRoute from './protect/ProtectedRoute';
 import AdminProtect from './protect/AdminProtect';
+import AdminAddUsers from './components/AdminAddUsers';
 
 function App() {
 
@@ -44,6 +45,14 @@ function App() {
             <UserDetails />
           </AdminProtect>
         } />
+
+        <Route path="/admin-add-user" element={
+          <AdminProtect>
+            <AdminAddUsers />
+          </AdminProtect>
+        } />
+
+
 
 
 

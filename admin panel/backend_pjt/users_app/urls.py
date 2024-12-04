@@ -11,6 +11,7 @@ urlpatterns = [
     path('users/<int:userId>/', views.UserDetailView.as_view(), name='user-detail'),
     path('block-unblock-user/<int:user_id>/', views.BlockUnblockUserView.as_view(), name='block-unblock-user'),
     path('user-update/', views.edit_user, name='user-update'),
+    path('add-user/', views.add_user, name='add-user'),
     
 ]
 
