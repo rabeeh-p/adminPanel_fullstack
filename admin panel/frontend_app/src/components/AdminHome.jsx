@@ -16,7 +16,7 @@ const AdminUserList = () => {
   const userRole = useSelector((state) => state.user.role);
 
   const sample = localStorage.getItem('userRole');
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -98,6 +98,27 @@ const AdminUserList = () => {
   if (error) {
     return <div>{error}</div>;
   }
+
+  const handleDeleteUser = async (userId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) return;
+  
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await axios.delete(`http://127.0.0.1:8000/delete-user/${userId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (response.status === 200) {
+        setUsers(users.filter((user) => user.id !== userId));
+        alert("User deleted successfully.");
+      }
+    } catch (error) {
+      alert("Failed to delete user.");
+    }
+  };
 
   return (
     <div style={{ padding: "20px", backgroundColor: "#f4f7fc" }}>
@@ -208,6 +229,21 @@ const AdminUserList = () => {
                   }}
                 >
                   {user.profile.blocked ? "Unblock" : "Block"}
+                </button>
+                <button
+                  onClick={() => handleDeleteUser(user.id)}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#e74c3c",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                    marginLeft:'10px'
+                  }}
+                >
+                  Delete
                 </button>
               </td>
             </tr>

@@ -11,6 +11,7 @@ import EditProfilePage from './components/EditUser';
 import ProtectedRoute from './protect/ProtectedRoute';
 import AdminProtect from './protect/AdminProtect';
 import AdminAddUsers from './components/AdminAddUsers';
+import LoginPage from './protect/LoginPage';
 
 function App() {
 
@@ -19,8 +20,18 @@ function App() {
 
       <Header />
       <Routes>
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/' element={<Login />} />
+        <Route path='/signup' element={
+          <LoginPage redirectTo="/adminhome">
+            <Signup />
+          </LoginPage>
+            } />
+          
+        <Route path='/' element={
+          <LoginPage redirectTo="/adminhome">
+
+            <Login />
+          </LoginPage>
+          } />
 
         <Route path='/userhome' element={
           <ProtectedRoute>

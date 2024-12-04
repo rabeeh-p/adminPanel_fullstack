@@ -241,3 +241,15 @@ def add_user(request):
         return Response({"message": "User created successfully"}, status=HTTP_201_CREATED)
     except Exception as e:
         return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['DELETE'])
+def delete_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return Response({"message": "User deleted successfully."}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    

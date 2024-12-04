@@ -15,6 +15,7 @@ const UserDetails = () => {
     email: "",
     phone_number: "",
   });
+  const [formErrors, setFormErrors] = useState({}); // Error state for validation
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -49,14 +50,37 @@ const UserDetails = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  
+    // Prevent spaces from being entered
+    if (name === "phone_number" || name === "first_name" || name === "last_name" || name === "email") {
+      // Remove spaces
+      const newValue = value.replace(/\s/g, '');
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: newValue,
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    let errors = {};
+    if (!formData.first_name) errors.first_name = "First name is required.";
+    if (!formData.last_name) errors.last_name = "Last name is required.";
+    if (!formData.email) errors.email = "Email is required.";
+    if (!formData.phone_number) errors.phone_number = "Phone number is required.";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     try {
       const token = localStorage.getItem("access_token");
       const response = await axios.put(
@@ -95,11 +119,11 @@ const UserDetails = () => {
 
   return (
     <div style={{ padding: "20px", backgroundColor: "#f9f9f9" }}>
-      <h2 style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>
+      <h2 style={{ fontSize: "24px", fontWeight: "bold", color: "#333", textAlign: "center" }}>
         User Details
       </h2>
       {user ? (
-        <div style={{ maxWidth: "600px", margin: "auto" }}>
+        <div style={{ maxWidth: "600px", margin: "auto", backgroundColor: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
           <div style={{ textAlign: "center", marginBottom: "20px" }}>
             {user.profile?.image ? (
               <img
@@ -110,6 +134,7 @@ const UserDetails = () => {
                   height: "150px",
                   borderRadius: "50%",
                   objectFit: "cover",
+                  marginBottom: "10px",
                 }}
               />
             ) : (
@@ -119,12 +144,42 @@ const UserDetails = () => {
                   height: "150px",
                   borderRadius: "50%",
                   backgroundColor: "#ccc",
+                  marginBottom: "10px",
                 }}
               ></div>
             )}
+            <p>
+              <strong>Email:</strong> {user.email}
+            </p>
+            <p>
+              <strong>Full Name:</strong> {user.first_name} {user.last_name}
+            </p>
+            <p>
+              <strong>Phone:</strong> {user.profile?.phone_number || "Not available"}
+            </p>
+            
+            <p>
+              <strong>Account Active:</strong> {user.profile.blocked ? "NO" : "Yes"}
+            </p>
+
+            <button
+              onClick={handleEditToggle}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#3498db",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                transition: "background-color 0.3s ease",
+                marginTop: "20px",
+              }}
+            >
+              Edit User Details
+            </button>
           </div>
 
-          {isEditing ? (
+          {isEditing && (
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
               <label>
                 First Name:
@@ -133,8 +188,9 @@ const UserDetails = () => {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleInputChange}
-                  required
+                  style={{ padding: "10px", margin: "5px 0", borderRadius: "4px", border: "1px solid #ddd" }}
                 />
+                {formErrors.first_name && <span style={{ color: "red", fontSize: "12px" }}>{formErrors.first_name}</span>}
               </label>
               <label>
                 Last Name:
@@ -143,8 +199,9 @@ const UserDetails = () => {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleInputChange}
-                  required
+                  style={{ padding: "10px", margin: "5px 0", borderRadius: "4px", border: "1px solid #ddd" }}
                 />
+                {formErrors.last_name && <span style={{ color: "red", fontSize: "12px" }}>{formErrors.last_name}</span>}
               </label>
               <label>
                 Email:
@@ -153,8 +210,9 @@ const UserDetails = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  required
+                  style={{ padding: "10px", margin: "5px 0", borderRadius: "4px", border: "1px solid #ddd" }}
                 />
+                {formErrors.email && <span style={{ color: "red", fontSize: "12px" }}>{formErrors.email}</span>}
               </label>
               <label>
                 Phone:
@@ -163,7 +221,9 @@ const UserDetails = () => {
                   name="phone_number"
                   value={formData.phone_number}
                   onChange={handleInputChange}
+                  style={{ padding: "10px", margin: "5px 0", borderRadius: "4px", border: "1px solid #ddd" }}
                 />
+                {formErrors.phone_number && <span style={{ color: "red", fontSize: "12px" }}>{formErrors.phone_number}</span>}
               </label>
               <button
                 type="submit"
@@ -180,39 +240,6 @@ const UserDetails = () => {
                 Save Changes
               </button>
             </form>
-          ) : (
-            <div>
-              <p>
-                <strong>Email:</strong> {user.email}
-              </p>
-              <p>
-                <strong>Full Name:</strong> {user.first_name} {user.last_name}
-              </p>
-              <p>
-                <strong>Phone:</strong> {user.profile?.phone_number || "Not available"}
-              </p>
-              <p>
-                <strong>Joined:</strong> {new Date(user.date_joined).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Account Active:</strong> {user.profile.blocked ? "NO" : "Yes"}
-              </p>
-              <button
-                onClick={handleEditToggle}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#3498db",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  transition: "background-color 0.3s ease",
-                  marginTop: "20px",
-                }}
-              >
-                Edit User Details
-              </button>
-            </div>
           )}
         </div>
       ) : (
@@ -223,4 +250,3 @@ const UserDetails = () => {
 };
 
 export default UserDetails;
-

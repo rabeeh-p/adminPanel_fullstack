@@ -8,7 +8,18 @@ const Header = () => {
     const dispatch = useDispatch();
 
     const accessToken = useSelector((state) => state.user.accessToken);
+    const userRole = useSelector((state) => state.user.userRole); 
+    console.log(userRole,'rolee header');
+    
     console.log(accessToken,'header');
+
+    const handleLogoClick = () => {
+        if (userRole === "superuser") {
+            navigate("/adminhome");  
+        } else {
+            navigate("/userhome");  
+        }
+    };
     
 
     const headerStyles = {
@@ -57,8 +68,7 @@ const Header = () => {
 
     return (
         <header style={headerStyles}>
-            <div style={logoStyles}>
-                {/* <img src="logo.png" alt="Logo" style={{ width: "40px", height: "40px" }} /> */}
+            <div style={logoStyles} onClick={handleLogoClick}>
                 <span style={logoTextStyles}>MyApp</span>
             </div>
             {accessToken ? (
