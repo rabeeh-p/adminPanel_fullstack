@@ -96,3 +96,45 @@ class UserSerializer(serializers.ModelSerializer):
             return UserProfileSerializer(profile).data
         except UserProfile.DoesNotExist:
             return None  # Return None if no profile exists
+        
+    
+
+
+
+
+
+
+
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['phone_number', 'image', 'blocked']
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ['email', 'first_name', 'last_name', 'is_active', 'profile']
+
+    def update(self, instance, validated_data):
+        # Separate profile data
+        profile_data = validated_data.pop('profile', None)
+
+        # Update the User fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        # If profile data is present, update the profile
+        if profile_data:
+            profile_instance = instance.profile
+            for attr, value in profile_data.items():
+                setattr(profile_instance, attr, value)
+            profile_instance.save()
+
+        # Save the updated User instance
+        instance.save()
+        return instance

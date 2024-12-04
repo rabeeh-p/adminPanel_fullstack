@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import MessageSerializer, UserSignupSerializer,UserSerializer,UserProfileSerializer
+from .serializers import MessageSerializer, UserSignupSerializer,UserSerializer,UserProfileSerializer,UserUpdateSerializer,UserProfile
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse
@@ -60,14 +60,7 @@ class UserLoginView(APIView):
         if user:
 
 
-            # block_status = user.profile.blocked if hasattr(user, 'profile') else False
-
-            # # If the user is blocked, return an error
-            # if block_status:
-            #     return Response(
-            #         {'detail': 'Your account is blocked. Please contact support.'},
-            #         status=status.HTTP_403_FORBIDDEN
-            #     )
+            
             
             block_status = user.profile.blocked if hasattr(user, 'profile') else False
             refresh = RefreshToken.for_user(user)
@@ -131,12 +124,16 @@ class UserListView(APIView):
     
 
 
+
+
+
 class UserDetailView(RetrieveAPIView):
     permission_classes = [IsAdminUser]  
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get_object(self):
+        print('is workign admin')
         user_id = self.kwargs['userId']
         print(user_id,'id')
         try:
@@ -144,7 +141,7 @@ class UserDetailView(RetrieveAPIView):
             return user
         except User.DoesNotExist:
             raise NotFound(detail="User not found.", code=404)
-        
+    
 
 class BlockUnblockUserView(APIView):
     permission_classes = [IsAuthenticated]  
@@ -162,8 +159,27 @@ class BlockUnblockUserView(APIView):
             status=status.HTTP_200_OK
         )
     
+class EditUserDetails(APIView):
+    permission_classes = [IsAdminUser]
 
+    def put(self, request, user_id):
+        """Handle PUT request to edit user details."""
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        # Check if the admin is trying to edit a superuser (prevent superuser editing)
+        if user.is_superuser:
+            return Response({"detail": "Cannot edit superuser details."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Use the new serializer for user updates
+        serializer = UserUpdateSerializer(user, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()  # Save the updated user details
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
