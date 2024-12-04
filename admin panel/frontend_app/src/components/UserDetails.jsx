@@ -8,14 +8,14 @@ const UserDetails = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+  const [isEditing, setIsEditing] = useState(false); 
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     phone_number: "",
   });
-  const [formErrors, setFormErrors] = useState({}); // Error state for validation
+  const [formErrors, setFormErrors] = useState({});  
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -45,15 +45,13 @@ const UserDetails = () => {
   }, [userId]);
 
   const handleEditToggle = () => {
-    setIsEditing(!isEditing); // Toggle between edit and view mode
+    setIsEditing(!isEditing);  
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
   
-    // Prevent spaces from being entered
     if (name === "phone_number" || name === "first_name" || name === "last_name" || name === "email") {
-      // Remove spaces
       const newValue = value.replace(/\s/g, '');
       setFormData((prevState) => ({
         ...prevState,
@@ -100,8 +98,8 @@ const UserDetails = () => {
         }
       );
 
-      setUser(response.data); // Update state with updated user data
-      setIsEditing(false); // Exit edit mode
+      setUser(response.data);  
+      setIsEditing(false);  
       alert("User details updated successfully.");
     } catch (error) {
       setError("Failed to update user details.");

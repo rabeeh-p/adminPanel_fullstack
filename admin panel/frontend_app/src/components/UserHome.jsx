@@ -12,17 +12,13 @@ const UserHomePage = () => {
 
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState("");
-  // const userRole = useSelector((state) => state.user.userRole);
-  // console.log(userRole,'rolee');
-  const userRole= localStorage.getItem('userRole') 
-  console.log(userRole,'userhoem roleee');
-  
-  
-  // if (userRole === "superuser") {
-  //   return <Navigate to="/adminhome" />
-  // }
-  
-  
+
+  const userRole = localStorage.getItem('userRole')
+  console.log(userRole, 'userhoem roleee');
+
+
+
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -36,7 +32,7 @@ const UserHomePage = () => {
         setError("Failed to fetch user details. Please try again.");
       }
     };
-   
+
 
     if (accessToken) {
       fetchUserDetails();
@@ -46,15 +42,14 @@ const UserHomePage = () => {
   if (!accessToken) {
     return <Navigate to="/" />;
   }
- 
-  
-  
+
+
+
 
   const handleLogout = () => {
     dispatch(logout());
   };
   const handleEdit = () => {
-    // Navigate to the edit page or show an edit form
     console.log("Edit button clicked");
     navigate('/edit-page')
   };
@@ -63,13 +58,13 @@ const UserHomePage = () => {
     <div style={styles.container}>
       <div style={styles.profileContainer}>
         <h2 style={styles.welcomeText}>Welcome, {userDetails?.username}</h2>
-        
+
         {error && <p style={styles.errorText}>{error}</p>}
-        
+
         {userDetails ? (
           <div style={styles.profileBox}>
             <h3 style={styles.profileTitle}>Profile Details</h3>
-            
+
             {userDetails.image && (
               <img
                 src={userDetails.image}
@@ -77,7 +72,7 @@ const UserHomePage = () => {
                 style={styles.profileImage}
               />
             )}
-            
+
             <div style={styles.details}>
               <p style={styles.detailsText}><strong>Username:</strong> {userDetails.username}</p>
               <p style={styles.detailsText}><strong>Email:</strong> {userDetails.email}</p>
@@ -85,8 +80,7 @@ const UserHomePage = () => {
               <p style={styles.detailsText}><strong>Last Name:</strong> {userDetails.last_name}</p>
               <p style={styles.detailsText}><strong>Ph number:</strong> {userDetails.phone_number}</p>
             </div>
-            
-            {/* <button onClick={handleLogout} style={styles.logoutButton}>Logout</button> */}
+
 
             <div style={styles.buttonContainer}>
               <button onClick={handleEdit} style={styles.logoutButton}>
@@ -173,7 +167,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "16px",
     transition: "background-color 0.3s",
-    marginLeft:'10px'
+    marginLeft: '10px'
   },
   logoutButtonHover: {
     backgroundColor: "#2980b9",

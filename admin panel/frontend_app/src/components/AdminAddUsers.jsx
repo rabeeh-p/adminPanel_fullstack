@@ -16,13 +16,11 @@ const AdminAddUsers = () => {
     const validateFields = () => {
         const { username, first_name, last_name, email, password } = newUser;
 
-        // Check for empty fields
         if (!username.trim() || !first_name.trim() || !last_name.trim() || !email.trim() || !password.trim()) {
             setError("All fields are required and cannot contain only spaces.");
             return false;
         }
 
-        // Check for email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             setError("Please enter a valid email address.");

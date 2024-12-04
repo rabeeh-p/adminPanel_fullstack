@@ -4,7 +4,6 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import UserHomePage from './components/UserHome';
-import { useEffect, useState } from 'react';
 import AdminHome from './components/AdminHome';
 import UserDetails from './components/UserDetails';
 import EditProfilePage from './components/EditUser';
@@ -62,9 +61,6 @@ function App() {
             <AdminAddUsers />
           </AdminProtect>
         } />
-
-
-
 
 
       </Routes>

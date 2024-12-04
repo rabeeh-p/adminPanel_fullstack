@@ -49,19 +49,7 @@ export const userSlice = createSlice({
       console.log("Access Token:", state.accessToken);
       const logoutRequest = async (accessToken) => {
         try {
-          // await axios.post(
-          //   "http://127.0.0.1:8000/logout/",
-          //   {}, // Body (empty in this case)
-          //   {
-          //     headers: {
-          //       Authorization: `Bearer ${accessToken}`,
-          //     },
-          //   }
-          // );
-         
-
-    
-          // Remove items from localStorage
+          
           localStorage.removeItem("access_token");
           localStorage.removeItem("user");
           localStorage.removeItem("userRole");
@@ -73,13 +61,11 @@ export const userSlice = createSlice({
         }
       };
     
-      // Call the logout request with the current access token
-      const accessToken = state.accessToken; // Extract token from state
+      const accessToken = state.accessToken; 
       if (accessToken) {
         logoutRequest(accessToken);
       }
     
-      // Reset Redux state
       state.accessToken = null;
       state.user = null;
       state.userRole = null;
@@ -94,7 +80,7 @@ export const userSlice = createSlice({
       state.blockedUsers = state.blockedUsers.filter((userId) => userId !== action.payload);
     },
     setRole: (state, action) => {
-      state.role = action.payload; // Allow manual role setting if needed
+      state.role = action.payload;  
     },
   },
 });

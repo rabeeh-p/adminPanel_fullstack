@@ -31,7 +31,7 @@ const Login = () => {
 
       if (response.user.block) {
         setMessage("Your account is blocked. Please contact support.");
-        return; // Stop further execution if blocked
+        return;  
       }
       
       localStorage.setItem("access_token", response.access);

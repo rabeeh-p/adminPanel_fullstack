@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
+import { useDispatch, useSelector } from "react-redux"; 
 import axios from "axios";
-import { blockUser, unblockUser } from "../redux/userSlice"; // Import actions
+import { blockUser, unblockUser } from "../redux/userSlice"; 
 
 const AdminUserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [searchTerm, setSearchTerm] = useState("");  
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -86,7 +86,6 @@ const AdminUserList = () => {
     }
   };
 
-  // Filter users based on search term
   const filteredUsers = users.filter(user =>
     user.first_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -148,7 +147,6 @@ const AdminUserList = () => {
         Add User
       </button>
 
-      {/* Search Bar */}
       <div style={{ marginBottom: "20px", textAlign: "center" }}>
         <input
           type="text"

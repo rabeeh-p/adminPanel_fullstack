@@ -6,7 +6,7 @@ const LoginPage = ({ children, redirectTo }) => {
     console.log(redirectTo,'iss');
     console.log(children,'iss');
     
-    const isAuthenticated = !!localStorage.getItem("access_token"); // Check if token exists
+    const isAuthenticated = !!localStorage.getItem("access_token");  
     return isAuthenticated ? <Navigate to={redirectTo} /> : children;
 }
 

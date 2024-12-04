@@ -31,7 +31,7 @@ const EditProfilePage = () => {
           first_name: response.data.first_name,
           last_name: response.data.last_name,
           phone_number: response.data.phone_number,
-          image: null, // Image will be updated separately
+          image: null,   
         });
       } catch (err) {
         setError("Failed to load user details.");
@@ -50,7 +50,6 @@ const EditProfilePage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Real-time validation
     if (name === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       setError("Invalid email format.");
     } else if (name === "phone_number" && value && isNaN(value)) {
@@ -71,7 +70,6 @@ const EditProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for empty or invalid fields
     for (const [key, value] of Object.entries(formData)) {
       if (key !== "image" && (!value || !value.trim())) {
         setError(`${key.replace("_", " ")} cannot be empty or spaces only.`);
@@ -102,7 +100,7 @@ const EditProfilePage = () => {
         },
       });
       setSuccessMessage("Profile updated successfully.");
-      setTimeout(() => navigate("/userhome"), 2000); // Redirect after success
+      setTimeout(() => navigate("/userhome"), 2000);  
     } catch (err) {
       setError("Failed to update profile. Please try again.");
     }
