@@ -58,6 +58,18 @@ class UserLoginView(APIView):
 
         user = authenticate(username=username, password=password)
         if user:
+
+
+            # block_status = user.profile.blocked if hasattr(user, 'profile') else False
+
+            # # If the user is blocked, return an error
+            # if block_status:
+            #     return Response(
+            #         {'detail': 'Your account is blocked. Please contact support.'},
+            #         status=status.HTTP_403_FORBIDDEN
+            #     )
+            
+            block_status = user.profile.blocked if hasattr(user, 'profile') else False
             refresh = RefreshToken.for_user(user)
             
             print(user.is_superuser,'admin')
@@ -68,6 +80,7 @@ class UserLoginView(APIView):
                     'username': user.username,
                     'email': user.email,
                     'is_superuser': user.is_superuser,  
+                    'block': block_status
                 }
             }
             
@@ -197,7 +210,7 @@ def add_user(request):
     data = request.data
     try:
         user = User.objects.create_user(
-            username=data["email"],
+            username=data["username"],
             first_name=data["first_name"],
             last_name=data["last_name"],
             email=data["email"],

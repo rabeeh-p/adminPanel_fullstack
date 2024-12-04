@@ -8,17 +8,15 @@ const AdminUserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const blockedUsers = useSelector((state) => state.user.blockedUsers);
   const userRole = useSelector((state) => state.user.role);
 
-  console.log(userRole,'rolee');
-  const sample= localStorage.getItem('userRole') 
-  console.log(sample,'samplee');
+  const sample = localStorage.getItem('userRole');
   
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -31,7 +29,6 @@ const AdminUserList = () => {
 
         if (Array.isArray(response.data)) {
           setUsers(response.data);
-          console.log(response.data, "data");
         } else {
           setError("Unexpected response format.");
         }
@@ -44,7 +41,7 @@ const AdminUserList = () => {
     };
 
     fetchUsers();
-  }, []); 
+  }, []);
 
   const handleViewUser = (userId) => {
     navigate(`/admin/user/${userId}`);
@@ -89,6 +86,11 @@ const AdminUserList = () => {
     }
   };
 
+  // Filter users based on search term
+  const filteredUsers = users.filter(user =>
+    user.first_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
     return <div>Loading users...!</div>;
   }
@@ -124,6 +126,23 @@ const AdminUserList = () => {
       >
         Add User
       </button>
+
+      {/* Search Bar */}
+      <div style={{ marginBottom: "20px", textAlign: "center" }}>
+        <input
+          type="text"
+          placeholder="Search by first name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "300px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+        />
+      </div>
+
       <table
         style={{
           width: "100%",
@@ -147,7 +166,7 @@ const AdminUserList = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <tr
               key={user.id}
               style={{
@@ -180,7 +199,7 @@ const AdminUserList = () => {
                     padding: "8px 16px",
                     backgroundColor: user.profile.blocked
                       ? "#e74c3c"
-                      : "#2ecc71", 
+                      : "#2ecc71",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
@@ -188,7 +207,7 @@ const AdminUserList = () => {
                     transition: "background-color 0.3s ease",
                   }}
                 >
-                  {user.profile.blocked ? "Unblock" : "Block"}{" "}
+                  {user.profile.blocked ? "Unblock" : "Block"}
                 </button>
               </td>
             </tr>
@@ -200,5 +219,3 @@ const AdminUserList = () => {
 };
 
 export default AdminUserList;
-
-

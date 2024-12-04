@@ -27,6 +27,13 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await loginUser(formData);
+      console.log(response,'responceeee');
+
+      if (response.user.block) {
+        setMessage("Your account is blocked. Please contact support.");
+        return; // Stop further execution if blocked
+      }
+      
       localStorage.setItem("access_token", response.access);
       localStorage.setItem("refresh_token", response.refresh);
       dispatch(setUser({ accessToken: response.access, user: response.user }));
@@ -57,7 +64,7 @@ const Login = () => {
               type="text"
               name="username"
               value={formData.username}
-              onChange={handleChange}
+              onChange={handleChange} 
               required
               style={styles.input}
             />

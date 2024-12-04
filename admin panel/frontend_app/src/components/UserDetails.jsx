@@ -37,6 +37,8 @@ const UserDetails = () => {
   if (error) {
     return <div>{error}</div>;
   }
+  {console.log(user.profile.blocked,"statusss");}
+
 
   return (
     <div style={{ padding: "20px", backgroundColor: "#f9f9f9" }}>
@@ -61,13 +63,13 @@ const UserDetails = () => {
               <div style={{ width: "150px", height: "150px", borderRadius: "50%", backgroundColor: "#ccc" }}></div>
             )}
           </div>
-          <p><strong>Username:</strong> {user.username}</p>
+          {/* <p><strong>Username:</strong> {user.username}</p> */}
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Full Name:</strong> {user.first_name} {user.last_name}</p>
           <p><strong>Phone:</strong> {user.profile?.phone_number || "Not available"}</p>
           <p><strong>Joined:</strong> {new Date(user.date_joined).toLocaleDateString()}</p>
-          <p><strong>Account Active:</strong> {user.is_active ? "Yes" : "No"}</p>
-          <p><strong>Is Staff:</strong> {user.is_staff ? "Yes" : "No"}</p>
+          <p><strong>Account Active:</strong> {user.profile.blocked ? "NO" : "Yes"}</p>
+          {/* <p><strong>Is Staff:</strong> {user.is_staff ? "Yes" : "No"}</p> */}
         </div>
       ) : (
         <p>User data is not available.</p>

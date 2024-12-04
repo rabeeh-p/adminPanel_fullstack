@@ -49,15 +49,15 @@ export const userSlice = createSlice({
       console.log("Access Token:", state.accessToken);
       const logoutRequest = async (accessToken) => {
         try {
-          await axios.post(
-            "http://127.0.0.1:8000/logout/",
-            {}, // Body (empty in this case)
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
+          // await axios.post(
+          //   "http://127.0.0.1:8000/logout/",
+          //   {}, // Body (empty in this case)
+          //   {
+          //     headers: {
+          //       Authorization: `Bearer ${accessToken}`,
+          //     },
+          //   }
+          // );
          
 
     
